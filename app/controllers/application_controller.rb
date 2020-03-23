@@ -1,12 +1,10 @@
 class ApplicationController < ActionController::Base
 
 def index
-  # user = User.find_by(user_secret_id: params[:user_secret_id])
-  # if user
-  #   render index
-  # else
-  #   render error
-  # end
+  user = User.find_by(secret_id: params[:user_secret_id])
+  if !user
+    render json: user
+  end
 end
 
 def messages
