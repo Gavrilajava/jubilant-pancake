@@ -1,7 +1,6 @@
 class ApplicationController < ActionController::Base
 
 def index
-  byebug
   user = User.find_by(secret_id: params[:user_secret_id])
   if !user
     render json: user
