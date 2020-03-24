@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_23_200301) do
+ActiveRecord::Schema.define(version: 2020_03_24_152334) do
 
   create_table "channels", force: :cascade do |t|
     t.string "title"
@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 2020_03_23_200301) do
 
   create_table "users", force: :cascade do |t|
     t.string "name"
-    t.string "picture"
+    t.string "picture", default: "http://picsum.photos/300"
     t.string "secret_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

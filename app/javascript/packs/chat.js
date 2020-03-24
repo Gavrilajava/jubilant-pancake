@@ -2,7 +2,11 @@ const BASE_URL = window.location.href
 let last_message_id = 0
 
 document.addEventListener("DOMContentLoaded", () => {
-  setInterval(loadAll(), 5000);
+  fetch(BASE_URL)
+  // .then(console.log)
+  .then(res => res.json())
+  .then(console.log)
+  // setInterval(loadAll(), 5000);
 })
 
 function loadAll() {
@@ -101,4 +105,4 @@ function loadAll() {
 
 
 
-let loadChannels(json)
+// let loadChannels(json)
