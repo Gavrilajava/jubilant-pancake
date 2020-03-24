@@ -5,6 +5,8 @@ class User < ApplicationRecord
     has_many :messages
     has_many :channels, through: :messages
 
+    validates :name, uniqueness: true
+
     # Test whether user is owner of a channel, for deletion/admin purposes
     def is_owner(channel)
         channel.owner == self
