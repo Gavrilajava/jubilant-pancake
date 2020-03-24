@@ -3,7 +3,11 @@ let last_message_id = 0
 const channel_list = document.querySelector("ui.contacts")
 
 document.addEventListener("DOMContentLoaded", () => {
-  setInterval(loadAll(), 5000);
+  fetch(BASE_URL)
+  // .then(console.log)
+  .then(res => res.json())
+  .then(console.log)
+  // setInterval(loadAll(), 5000);
 })
 
 function loadAll() {
@@ -14,6 +18,7 @@ function loadAll() {
       loadChannels(json)
     })
 }
+
 
 
 
@@ -142,6 +147,7 @@ let displayChannel = (channel) => {
   channel_list.append(li)
 }
 
+
 let getActiveChat = () => {
   activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
   if (!activeChat) {activeChat = channel_list[0]; activeChat.className = ""}
@@ -157,3 +163,4 @@ let setActivechat = (li) => {
   resetActiveChat()
   li.className = "active"
 }
+
