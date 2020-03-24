@@ -24,7 +24,13 @@ class User < ApplicationRecord
         self.channels.map do |channel|
             { title: channel.title,
               owner: channel.owner.name,
-              messages: channel.messages.select{|message| message.id > last_id.to_i}
+              image: channel.owner.picture,
+              messages: channel.messages.includes(:user).select{|message| message.id > last_id.to_i}.map{|message| {
+                sender: message.user.name,
+                icon: message.user.picture,
+                created: message.created_at,
+                body: message.body
+              }}
             }
         end
     end
