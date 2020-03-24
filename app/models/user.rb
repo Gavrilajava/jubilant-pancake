@@ -23,20 +23,28 @@ class User < ApplicationRecord
     # Each outer array index corresponds to a user's channels (that they have posted in)
     # Each inner array is made of posts made in that channel, after the "last_id"
     def new_messages(last_id)
-        self.channels.map do |channel|
-            { title: channel.title,
-              owner: channel.owner.name,
-              image: channel.owner.picture,
-              id: channel.id,
-              messages: channel.messages.includes(:user).select{|message| message.id > last_id.to_i}.map{|message| {
-                sender: message.user.name,
-                icon: message.user.picture,
-                created: message.created_at,
-                body: message.body,
-                id: message.id
-              }}
-            }
-        end
+        {
+          self: {
+          id: self.id,
+          name: self.name,
+          picture: self.picture
+          },
+          channels:
+          self.channels.map do |channel|
+              { title: channel.title,
+                owner: channel.owner.name,
+                image: channel.owner.picture,
+                id: channel.id,
+                messages: channel.messages.includes(:user).select{|message| message.id > last_id.to_i}.map{|message| {
+                  sender: message.user.name,
+                  icon: message.user.picture,
+                  created: message.created_at,
+                  body: message.body,
+                  id: message.id
+                }}
+              }
+          end
+        }
     end
 
 end
