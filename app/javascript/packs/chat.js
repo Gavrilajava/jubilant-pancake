@@ -1,6 +1,7 @@
 const BASE_URL = window.location.href 
 let last_message_id = 0
 const channel_list = document.querySelector("ui.contacts")
+const messageContainer = document.querySelector("div.card-body.msg_card_body")
 
 document.addEventListener("DOMContentLoaded", () => {
   loadAll()
@@ -11,8 +12,8 @@ function loadAll() {
   fetch(BASE_URL+'/'+last_message_id)
     .then(resp => resp.json())
     .then(json => {
-      loadMessages(json)
       loadChannels(json)
+      loadMessages(json)
     })
 }
 
@@ -20,10 +21,11 @@ function loadAll() {
 let loadMessages = (json) => {
   console.log(json)
   let channelCard = document.querySelectorAll("div.card")[0]
-  let messageCard = document.querySelectorAll("div.card")[1]
-  let activeChannel = channelCard.querySelector(".contacts li.active")
-
-  let createMessage = (message) => { }
+  
+  let activeChannel = getActiveChatId()
+  let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
+  ourChannel.messages.forEach(message => createMessage(message, json.self))
+  
 
 // Styling when sender is not self
 // <div class="d-flex justify-content-start mb-4">
@@ -50,9 +52,38 @@ let loadMessages = (json) => {
 
 }
 
+let createMessage = (message, self) => {
+  let divCont = document.createElement("div")
+  let divMsgCont = document.createElement("div")
+  divMsgCont.innerText = message.body
+  let span = document.createElement("span")
+  divMsgCont.append(span)
+  let imgCont = document.createElement("div")
+  let img = document.createElement("img")
+  imgCont.className = "img_cont_msg"
+  img.className = "rounded-circle user_img_msg"
+  img.src = message.icon
+  imgCont.append(img)
+  if (message.sender === self.name){
+    divCont.className = "d-flex justify-content-end mb-4"
+    divMsgCont.className = "msg_cotainer_send"
+    span.className = "msg_time_send"
+    divCont.append(divMsgCont, imgCont)
+    span.innerText = `sent at: ${(new Date(message.created)).toLocaleString()}`
+  }
+  else{
+    divCont.className = "d-flex justify-content-start mb-4"
+    divMsgCont.className = "msg_cotainer"
+    span.className = "msg_time"
+    divCont.append(imgCont, divMsgCont)
+    span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
+  }
+  messageContainer.append(divCont)
+ }
+
 let loadChannels = (json) => {
     activeChats = Array.from(channel_list.querySelectorAll("li"))
-    json.forEach(channel => {
+    json.channels.forEach(channel => {
       let li = activeChats.find(item => item.id == `channel${channel.id}`)
       if (!li){
         displayChannel(channel)
@@ -60,7 +91,7 @@ let loadChannels = (json) => {
     })
     activeChats.forEach(li =>{
       let ch_id = li.id.replace('channel','')
-      if (!(json.find(chan => chan.id == ch_id))){
+      if (!(json.channels.find(chan => chan.id == ch_id))){
         li.remove()
       }
     })
@@ -92,13 +123,16 @@ let displayChannel = (channel) => {
 
 
 let getActiveChat = () => {
-  activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
-  if (!activeChat) {activeChat = channel_list[0]; activeChat.className = ""}
+  let activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
+  if (!activeChat) {activeChat = channel_list.querySelector("li"); activeChat.className = ""}
   return activeChat
 }
 
+let getActiveChatId = () => parseInt(getActiveChat().id.replace('channel',''))
+  
+
 let resetActiveChat = () => {
-  activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
+  let activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
   if (!!activeChat) { activeChat.className = ""}
 }
 
