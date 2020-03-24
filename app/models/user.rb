@@ -25,11 +25,13 @@ class User < ApplicationRecord
             { title: channel.title,
               owner: channel.owner.name,
               image: channel.owner.picture,
+              id: channel.id,
               messages: channel.messages.includes(:user).select{|message| message.id > last_id.to_i}.map{|message| {
                 sender: message.user.name,
                 icon: message.user.picture,
                 created: message.created_at,
-                body: message.body
+                body: message.body,
+                id: message.id
               }}
             }
         end
