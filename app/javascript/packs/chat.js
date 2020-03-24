@@ -126,11 +126,7 @@ let loadChannels = (json) => {
 let displayChannel = (channel) => {
   const li = document.createElement("li")
   li.id = `channel${channel.id}`
-  li.addEventListener("click", () => {
-    let activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
-    if (!!activeChat){Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`).className = ""}
-    li.className = "active"
-  })
+  li.addEventListener("click", () => setActivechat(li))
   const divCont = document.createElement("div")
   divCont.className = "d-flex bd-highlight"
   const imgCont = document.createElement("div")
@@ -149,5 +145,22 @@ let displayChannel = (channel) => {
   divCont.append(imgCont, chnlInfo)
   li.append(divCont)
   channel_list.append(li)
+}
+
+
+let getActiveChat = () => {
+  activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
+  if (!activeChat) {activeChat = channel_list[0]; activeChat.className = ""}
+  return activeChat
+}
+
+let resetActiveChat = () => {
+  activeChat = Array.from(channel_list.querySelectorAll("li")).find(item => item.className == `active`)
+  if (!!activeChat) { activeChat.className = ""}
+}
+
+let setActivechat = (li) => {
+  resetActiveChat()
+  li.className = "active"
 }
 
