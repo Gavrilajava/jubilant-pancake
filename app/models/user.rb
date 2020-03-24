@@ -22,10 +22,11 @@ class User < ApplicationRecord
     # Each inner array is made of posts made in that channel, after the "last_id"
     def new_messages(last_id)
         self.channels.map do |channel|
-            channel.messages.select do |message|
-                message.id > last_id
-            end
-        end.flatten
+            { title: channel.title,
+              owner: channel.owner.name,
+              messages: channel.messages.select{|message| message.id > last_id.to_i}
+            }
+        end
     end
 
 end
