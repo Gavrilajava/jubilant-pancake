@@ -3,7 +3,11 @@ let last_message_id = 0
 const channel_list = document.querySelector("ui.contacts")
 
 document.addEventListener("DOMContentLoaded", () => {
-  setInterval(loadAll(), 5000);
+  fetch(BASE_URL)
+  // .then(console.log)
+  .then(res => res.json())
+  .then(console.log)
+  // setInterval(loadAll(), 5000);
 })
 
 function loadAll() {
@@ -14,6 +18,7 @@ function loadAll() {
       loadChannels(json)
     })
 }
+
 
 
 
@@ -145,3 +150,4 @@ let displayChannel = (channel) => {
   li.append(divCont)
   channel_list.append(li)
 }
+
