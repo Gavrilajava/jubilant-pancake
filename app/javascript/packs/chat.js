@@ -9,7 +9,7 @@ function loadAll() {
   fetch(BASE_URL+'/'+last_message_id)
     .then(resp => resp.json())
     .then(json => {
-      loadMessages(json)
+      // loadMessages(json)
       loadChannels(json)
     })
 }
@@ -101,4 +101,6 @@ function loadAll() {
 
 
 
-let loadChannels(json)
+let loadChannels = (json) => {
+    debugger
+}
