@@ -4,9 +4,10 @@ const channel_list = document.querySelector("ui.contacts")
 const footer = document.querySelector("div#footer_that_needed")
 const channelCard = document.querySelector("div.card#card_that_needed")
 const chatCard = document.querySelectorAll("div.card")[1]
-// channelCard.insertBefore( "fggfgf", footer)
 const sendBtn = document.querySelector(".input-group-text.send_btn")
-let currentUserId
+const newChannelBtn = document.querySelector("i.fa-plus")
+const newChannelName = document.querySelector("input.form-control.search")
+let currentUserId 
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -27,6 +28,25 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(resp => resp.json())
       .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
       .then(document.querySelector("textarea.form-control.type_msg").value = "")
+    
+  })
+  newChannelBtn.addEventListener("click", () => {
+    params = {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        type: "channel",
+        title: newChannelName.value,
+      })
+    }
+    fetch(BASE_URL, params)
+      .then(resp => resp.json())
+      .then(json => {
+        newChannelName.value = ""
+        displayChannel(json.channel)
+        createMessage(json.message, json.self, getDivFromChannelId(json.channel.id))
+      })
+
     
   })
   // setInterval(loadAll(), 5000);

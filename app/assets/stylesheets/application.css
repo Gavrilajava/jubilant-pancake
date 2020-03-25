@@ -45,7 +45,7 @@
 .card-footer{
 border-radius: 0 0 15px 15px !important;
   border-top: 0 !important;
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
 }
@@ -244,5 +244,5 @@ margin-bottom: 15px !important;
 }
 
 #footer_that_needed{
-  background-color: rgba(0,0,0,.8)
+  background-color: rgba(0,0,0,.03)
 }
