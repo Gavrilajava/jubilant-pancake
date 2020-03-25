@@ -159,6 +159,7 @@ let loadChannels = (json) => {
       }
       activeChats = Array.from(channel_list.querySelectorAll("li"))
     })
+    setActivechat(activeChats[0])
     activeChats.forEach(li =>{
       let ch_id = li.id.replace('channel','')
       if (!(json.channels.find(chan => chan.id == ch_id))){
