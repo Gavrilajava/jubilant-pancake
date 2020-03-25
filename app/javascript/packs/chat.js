@@ -13,24 +13,14 @@ let currentUserId
 document.addEventListener("DOMContentLoaded", () => {
 
   loadAll()
-  sendBtn.addEventListener("click", () => {
-    params = {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        type: "message",
-        body: document.querySelector("textarea.form-control.type_msg").value,
-        user_id: currentUserId,
-        channel_id: getActiveChatId(), 
-        user_secret_id: getSecretIdFromUrl(BASE_URL)
-      })
+  sendBtn.addEventListener("click", () => sendMessage())
+
+  window.addEventListener('keypress', (e) => {
+    if (e.keyCode == 13) {
+      sendMessage()
     }
-    fetch(BASE_URL, params)
-      .then(resp => resp.json())
-      .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
-      .then(document.querySelector("textarea.form-control.type_msg").value = "")
-    
-  })
+  }, false);
+
   newChannelBtn.addEventListener("click", () => {
     params = {
       method: "POST",
@@ -94,6 +84,26 @@ let loadMessages = (json) => {
 // </div>
 
 
+}
+
+let sendMessage = () => {
+  if (document.querySelector("textarea.form-control.type_msg").value != ""){
+    params = {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        type: "message",
+        body: document.querySelector("textarea.form-control.type_msg").value,
+        user_id: currentUserId,
+        channel_id: getActiveChatId(), 
+        user_secret_id: getSecretIdFromUrl(BASE_URL)
+      })
+    }
+    fetch(BASE_URL, params)
+      .then(resp => resp.json())
+      .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
+      .then(document.querySelector("textarea.form-control.type_msg").value = "")
+  }
 }
 
 let createMessage = (message, self, messageContainer) => {
