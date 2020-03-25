@@ -104,7 +104,7 @@ background-color: rgba(0,0,0,0.3) !important;
   margin-bottom: 15px !important;
 }
 .active{
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0,0,0,0.25);
 }
 .user_img{
   height: 70px;
@@ -215,8 +215,8 @@ padding: 15px 0;
 background-color: rgba(0,0,0,0.5);
 color: white;
 border-radius: 15px;
-top: 30px;
-right: 15px;
+top: 5px;
+right: 25px;
 display: none;
 }
 .action_menu ul{
