@@ -45,6 +45,9 @@
 .card-footer{
 border-radius: 0 0 15px 15px !important;
   border-top: 0 !important;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 .container{
   align-content: center;
@@ -238,4 +241,8 @@ background-color: rgba(0,0,0,0.2);
 .contacts_card{
 margin-bottom: 15px !important;
 }
+}
+
+#footer_that_needed{
+  background-color: rgba(0,0,0,.8)
 }

@@ -30,7 +30,7 @@ class User < ApplicationRecord
           picture: self.picture
           },
           channels:
-          self.channels.map do |channel|
+          self.channels.map { |channel|
               { title: channel.title,
                 owner: channel.owner.name,
                 image: channel.owner.picture,
@@ -43,7 +43,7 @@ class User < ApplicationRecord
                   id: message.id
                 }}
               }
-          end
+            }.uniq
         }
     end
 
