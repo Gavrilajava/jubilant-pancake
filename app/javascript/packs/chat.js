@@ -64,8 +64,8 @@ function loadAll() {
 
 
 let loadMessages = (json) => {
-  let activeChannel = getActiveChatId()
-  let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
+  // let activeChannel = getActiveChatId()
+  // let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
   json.channels.forEach(ourChannel => ourChannel.messages.forEach(message => createMessage(message, json.self, getDivFromChannelId(ourChannel.id))))
   
 
@@ -223,7 +223,40 @@ let setActivechat = (li) => {
     }
     else {chatDiv.style.display = ""}
   })
+  // Updates the message header to display current channel
+  updateMessageHeader(li)
 }
+
+let updateMessageHeader = (currentChannelListItem = undefined) => {
+  let msgHeader = document.querySelector(".card-header.msg_head")
+  let msgHeaderContent = msgHeader.querySelector(".d-flex.bd-highlight")
+  let msgHeaderImg = msgHeaderContent.querySelector(".rounded-circle.user_img")
+  let msgHeaderChannel = msgHeaderContent.querySelector(".user_info span")
+
+  if(currentChannelListItem == undefined) {
+    msgHeaderImg.src = "http://picsum.photos/202"
+    msgHeaderChannel.innerText = "Select a Channel"
+  }
+  else {
+    msgHeaderImg.src = currentChannelListItem.querySelector("img").src
+    msgHeaderChannel.innerText = currentChannelListItem.querySelector("span").innerText
+  }
+}
+
+// Run once here to set to defaults
+updateMessageHeader()
+
+
+// Define variable
+let actionMenuBtn = document.querySelector("span#action_menu_btn")
+let actionMenu = document.querySelector(".action_menu")
+let actionMenuItem = actionMenu.querySelector("li")
+let toggleInviteBox = () => {
+    actionMenu.style.display == "none" ? actionMenu.style.display = "block" : actionMenu.style.display = "none"
+}
+
+actionMenuBtn.addEventListener("click", () => {toggleInviteBox()})
+
 
 let getDivFromChannelId = (id) => Array.from(channelCard.querySelectorAll("div.card-body.msg_card_body")).find(chatDiv => chatDiv.id == `channel${id}`)
 
