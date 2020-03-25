@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
   })
-  // setInterval(() => loadAll(), 500);
+  setInterval(() => loadAll(), 500);
 })
 
 function loadAll() {
