@@ -1,6 +1,7 @@
 		<div class="container-fluid h-100">
 			<div class="row justify-content-center h-100">
-				<div class="col-md-4 col-xl-3 chat"><div class="card mb-sm-3 mb-md-0 contacts_card">
+				<div class="col-md-4 col-xl-3 chat">
+          <div class="card mb-sm-3 mb-md-0 contacts_card">
 					<div class="card-header">
 						<div class="input-group">
 							<input type="text" placeholder="Create New..." name="" class="form-control search">
@@ -10,12 +11,13 @@
 						</div>
 					</div>
 					<div class="card-body contacts_body">
-						<ui class="contacts">
+						<ui id = "chats_list" class="contacts">
 
 						</ui>
 					</div>
 					<div class="card-footer"></div>
-				</div></div>
+				  </div>
+        </div>
 				<div class="col-md-8 col-xl-6 chat">
 					<div class="card" id = "card_that_needed">
 						<div class="card-header msg_head">
@@ -57,6 +59,25 @@
 						</div>
 					</div>
 				</div>
+        <div id = "chat_inviter" class="invisible">
+          <div class="card mb-sm-3 mb-md-0 contacts_card">
+					<div class="card-header">
+						<div class="input-group">
+							<input type="text" placeholder="Search Here..." name="" class="form-control search">
+							<div class="input-group-prepend">
+								
+							</div>
+              <span class="input-group-text search_btn"><i class="far fa-times-circle"></i></span>
+						</div>
+					</div>
+					<div class="card-body contacts_body">
+						<ui id = "users_list" class="contacts">
+
+						</ui>
+					</div>
+					<div class="card-footer"></div>
+				  </div>
+        </div>
 			</div>
 		</div>
 

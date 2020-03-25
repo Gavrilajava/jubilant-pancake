@@ -1,12 +1,16 @@
 const BASE_URL = window.location.href 
 let last_message_id = 0
-const channel_list = document.querySelector("ui.contacts")
+const channel_list = document.querySelector("ui.contacts#chats_list")
+const users_list = document.querySelector("ui.contacts#users_list")
 const footer = document.querySelector("div#footer_that_needed")
 const channelCard = document.querySelector("div.card#card_that_needed")
 const chatCard = document.querySelectorAll("div.card")[1]
 const sendBtn = document.querySelector(".input-group-text.send_btn")
 const newChannelBtn = document.querySelector("i.fa-plus")
 const newChannelName = document.querySelector("input.form-control.search")
+const chatInviter = document.querySelector("div#chat_inviter")
+const chatInviterClsBtn = document.querySelector(".far.fa-times-circle")
+const chatInviterOpnBtn = document.querySelector(".fa.fa-address-card")
 let currentUserId 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -49,6 +53,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
   })
+  chatInviterOpnBtn.addEventListener("click", () => chatInviter.className = "col-md-4 col-xl-3 chat")
+  chatInviterClsBtn.addEventListener("click", () => {
+
+    chatInviter.className = "invisible"
+  })
+
   // setInterval(loadAll(), 5000);
 })
 
