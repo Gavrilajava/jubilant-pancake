@@ -1,5 +1,7 @@
 class ApplicationController < ActionController::Base
 
+skip_before_action :verify_authenticity_token
+
 def index
   user = User.find_by(secret_id: params[:user_secret_id])
   if !user
@@ -13,9 +15,9 @@ def messages
 end
 
 def new_message
-  user = User.find_by(secret_id: params[:message][:user_secret_id])
-  message = Message.create(user_id: user.id, channel_id: params[:message][:channel_id], body: params[:message][:body])
-  render json: message
+  user = User.find(params[:user_id])
+  message = Message.create(user_id: user.id, channel_id: params[:channel_id], body: params[:body])
+  render json: message.to_js
 end
 
 def new_channel

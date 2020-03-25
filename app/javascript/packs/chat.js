@@ -1,10 +1,34 @@
 const BASE_URL = window.location.href 
 let last_message_id = 0
 const channel_list = document.querySelector("ui.contacts")
-const messageContainer = document.querySelector("div.card-body.msg_card_body")
+const footer = document.querySelector("div#footer_that_needed")
+const channelCard = document.querySelector("div.card#card_that_needed")
+const chatCard = document.querySelectorAll("div.card")[1]
+// channelCard.insertBefore( "fggfgf", footer)
+const sendBtn = document.querySelector(".input-group-text.send_btn")
+let currentUserId
 
 document.addEventListener("DOMContentLoaded", () => {
+
   loadAll()
+  sendBtn.addEventListener("click", () => {
+    params = {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        type: "message",
+        body: document.querySelector("textarea.form-control.type_msg").value,
+        user_id: currentUserId,
+        channel_id: getActiveChatId(), 
+        user_secret_id: getSecretIdFromUrl(BASE_URL)
+      })
+    }
+    fetch(BASE_URL, params)
+      .then(resp => resp.json())
+      .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
+      .then(document.querySelector("textarea.form-control.type_msg").value = "")
+    
+  })
   // setInterval(loadAll(), 5000);
 })
 
@@ -12,6 +36,7 @@ function loadAll() {
   fetch(BASE_URL+'/'+last_message_id)
     .then(resp => resp.json())
     .then(json => {
+      currentUserId = json.self.id
       loadChannels(json)
       loadMessages(json)
     })
@@ -19,12 +44,9 @@ function loadAll() {
 
 
 let loadMessages = (json) => {
-  console.log(json)
-  let channelCard = document.querySelectorAll("div.card")[0]
-  
   let activeChannel = getActiveChatId()
   let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
-  ourChannel.messages.forEach(message => createMessage(message, json.self))
+  json.channels.forEach(ourChannel => ourChannel.messages.forEach(message => createMessage(message, json.self, getDivFromChannelId(ourChannel.id))))
   
 
 // Styling when sender is not self
@@ -52,7 +74,7 @@ let loadMessages = (json) => {
 
 }
 
-let createMessage = (message, self) => {
+let createMessage = (message, self, messageContainer) => {
   let divCont = document.createElement("div")
   let divMsgCont = document.createElement("div")
   divMsgCont.innerText = message.body
@@ -82,12 +104,13 @@ let createMessage = (message, self) => {
  }
 
 let loadChannels = (json) => {
-    activeChats = Array.from(channel_list.querySelectorAll("li"))
+    let activeChats = Array.from(channel_list.querySelectorAll("li"))
     json.channels.forEach(channel => {
       let li = activeChats.find(item => item.id == `channel${channel.id}`)
       if (!li){
         displayChannel(channel)
       }
+      activeChats = Array.from(channel_list.querySelectorAll("li"))
     })
     activeChats.forEach(li =>{
       let ch_id = li.id.replace('channel','')
@@ -98,6 +121,11 @@ let loadChannels = (json) => {
 }
 
 let displayChannel = (channel) => {
+  const messagesDiv = document.createElement("div")
+  messagesDiv.className = "card-body msg_card_body"
+  messagesDiv.id = `channel${channel.id}`
+  messagesDiv.style.display = "none"
+  channelCard.insertBefore(messagesDiv, footer)
   const li = document.createElement("li")
   li.id = `channel${channel.id}`
   li.addEventListener("click", () => setActivechat(li))
@@ -139,5 +167,19 @@ let resetActiveChat = () => {
 let setActivechat = (li) => {
   resetActiveChat()
   li.className = "active"
+  let allChats = channelCard.querySelectorAll("div.card-body.msg_card_body")
+  allChats.forEach(chatDiv => {
+    if (chatDiv.id != li.id){
+      chatDiv.style.display = "none"
+    }
+    else {chatDiv.style.display = ""}
+  })
 }
 
+let getDivFromChannelId = (id) => Array.from(channelCard.querySelectorAll("div.card-body.msg_card_body")).find(chatDiv => chatDiv.id == `channel${id}`)
+
+
+let getSecretIdFromUrl = (url) => {
+  let arr = url.split('/')
+  return arr[arr.length -1]
+}
