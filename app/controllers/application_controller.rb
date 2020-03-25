@@ -15,9 +15,18 @@ def messages
 end
 
 def new_message
-  user = User.find(params[:user_id])
-  message = Message.create(user_id: user.id, channel_id: params[:channel_id], body: params[:body])
-  render json: message.to_js
+  if params[:type] == "message"
+    user = User.find_by(secret_id: params[:user_secret_id])
+    message = Message.create(user_id: user.id, channel_id: params[:channel_id], body: params[:body])
+    render json: message.to_js
+  elsif params[:type] == "channel"
+    user = User.find_by(secret_id: params[:user_secret_id])
+    if user
+      channel = Channel.create(owner: user, title: params[:title])
+      message = Message.create(user_id: user.id, channel_id: channel.id, body: "#{user.name} created that channel")
+      render json: channel.to_js
+    end
+  end
 end
 
 def new_channel

@@ -4,9 +4,10 @@ const channel_list = document.querySelector("ui.contacts")
 const footer = document.querySelector("div#footer_that_needed")
 const channelCard = document.querySelector("div.card#card_that_needed")
 const chatCard = document.querySelectorAll("div.card")[1]
-// channelCard.insertBefore( "fggfgf", footer)
 const sendBtn = document.querySelector(".input-group-text.send_btn")
-let currentUserId
+const newChannelBtn = document.querySelector("i.fa-plus")
+const newChannelName = document.querySelector("input.form-control.search")
+let currentUserId 
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -27,6 +28,25 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(resp => resp.json())
       .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
       .then(document.querySelector("textarea.form-control.type_msg").value = "")
+    
+  })
+  newChannelBtn.addEventListener("click", () => {
+    params = {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        type: "channel",
+        title: newChannelName.value,
+      })
+    }
+    fetch(BASE_URL, params)
+      .then(resp => resp.json())
+      .then(json => {
+        newChannelName.value = ""
+        displayChannel(json.channel)
+        createMessage(json.message, json.self, getDivFromChannelId(json.channel.id))
+      })
+
     
   })
   // setInterval(loadAll(), 5000);
@@ -101,6 +121,33 @@ let createMessage = (message, self, messageContainer) => {
     span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
   }
   messageContainer.append(divCont)
+  appendGreenSpan(messageContainer.id)
+ }
+
+ let appendGreenSpan = (id) => {
+   let channelLine = checkIfItAlreadyThere(id)
+   if (!!channelLine){
+      let span = document.createElement("span")
+      span.className = "online_icon"
+      channelLine.append(span)
+   }
+ }
+
+ let checkIfItAlreadyThere = (id) => {
+   let li = channel_list.querySelector(`li#${id}`)
+   if (li.querySelector("span.online_icon")){
+     return null
+   }
+   else {
+     return li.querySelector("div.img_cont")
+   }
+ }
+
+ let deleteGreenSpan = (li) => {
+   let span = li.querySelector("span.online_icon")
+    if (!!span) {
+      span.remove()
+    }
  }
 
 let loadChannels = (json) => {
@@ -112,6 +159,7 @@ let loadChannels = (json) => {
       }
       activeChats = Array.from(channel_list.querySelectorAll("li"))
     })
+    setActivechat(activeChats[0])
     activeChats.forEach(li =>{
       let ch_id = li.id.replace('channel','')
       if (!(json.channels.find(chan => chan.id == ch_id))){
@@ -167,6 +215,7 @@ let resetActiveChat = () => {
 let setActivechat = (li) => {
   resetActiveChat()
   li.className = "active"
+  deleteGreenSpan(li)
   let allChats = channelCard.querySelectorAll("div.card-body.msg_card_body")
   allChats.forEach(chatDiv => {
     if (chatDiv.id != li.id){
