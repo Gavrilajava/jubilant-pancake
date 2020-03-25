@@ -121,6 +121,33 @@ let createMessage = (message, self, messageContainer) => {
     span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
   }
   messageContainer.append(divCont)
+  appendGreenSpan(messageContainer.id)
+ }
+
+ let appendGreenSpan = (id) => {
+   let channelLine = checkIfItAlreadyThere(id)
+   if (!!channelLine){
+      let span = document.createElement("span")
+      span.className = "online_icon"
+      channelLine.append(span)
+   }
+ }
+
+ let checkIfItAlreadyThere = (id) => {
+   let li = channel_list.querySelector(`li#${id}`)
+   if (li.querySelector("span.online_icon")){
+     return null
+   }
+   else {
+     return li.querySelector("div.img_cont")
+   }
+ }
+
+ let deleteGreenSpan = (li) => {
+   let span = li.querySelector("span.online_icon")
+    if (!!span) {
+      span.remove()
+    }
  }
 
 let loadChannels = (json) => {
@@ -187,6 +214,7 @@ let resetActiveChat = () => {
 let setActivechat = (li) => {
   resetActiveChat()
   li.className = "active"
+  deleteGreenSpan(li)
   let allChats = channelCard.querySelectorAll("div.card-body.msg_card_body")
   allChats.forEach(chatDiv => {
     if (chatDiv.id != li.id){
