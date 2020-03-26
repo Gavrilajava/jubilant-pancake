@@ -269,7 +269,7 @@ let actionMenu = document.querySelector(".action_menu")
 let actionMenuItem = actionMenu.querySelector("li")
 
 let toggleInviteBox = () => {
-    actionMenu.style.display == "none" ? actionMenu.style.display = "block" : actionMenu.style.display = "none"
+    actionMenu.style.display == "block" ? actionMenu.style.display = "none" : actionMenu.style.display = "block"
 }
 
 let inviteSelect = document.querySelector("#invite-select")
