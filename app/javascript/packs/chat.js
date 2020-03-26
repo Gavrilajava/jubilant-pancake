@@ -15,6 +15,7 @@ let msgHeaderImg = msgHeaderContent.querySelector(".rounded-circle.user_img")
 let msgHeaderChannel = msgHeaderContent.querySelector(".user_info span")
 let msgHeaderMsgCount = msgHeaderContent.querySelector(".user_info p")
 const message_counter = document.querySelector("p#message_counter")
+const newSound = document.querySelector("#messageSound")
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -55,11 +56,23 @@ let loadAll = () => {
       loadChannels(json)
       loadMessages(json)
       setActiveChat(getActiveChat())
+      playSound(json)
     })
 }
 
 let loadMessages = (json) => {
   json.channels.forEach(ourChannel => ourChannel.messages.forEach(message => createMessage(message, json.self, getDivFromChannelId(ourChannel.id))))
+}
+
+let playSound = (json) => {
+  if (json.channels.some(channel => (channel.id != getActiveChatId() && channel.messages.length > 0))){
+    try{
+    newSound.play()
+    }
+    catch {
+      console.log("Something happened")
+    }
+  }
 }
 
 let sendMessage = () => {
@@ -88,8 +101,6 @@ let createMessage = (message, self, messageContainer) => {
     let divCont = document.createElement("div")
     divCont.id = `message${message.id}`
     let divMsgCont = document.createElement("div")
-    let sdfgs = addImageTags(message.body)
-    debugger
     divMsgCont.innerHTML = addImageTags(message.body)
     let span = document.createElement("span")
     divMsgCont.append(span)
@@ -124,11 +135,8 @@ let createMessage = (message, self, messageContainer) => {
 
 let addImageTags = (str) => {
   return str.split(" ").map(word => {
-    debugger
     if (word.substring(0, 4) === "http" && IMAGES.includes(word.substring(word.length-4))){
-
       word = `<br><img src ="${word}" class="image_msg"><br>`
-      debugger
     }
     return word
   }).join(" ")
@@ -314,7 +322,6 @@ inviteBtn.addEventListener("click", () => {
   fetch(BASE_URL, params)
     .then(resp => resp.json())
     .then(message => {
-      debugger
       createMessage(message, message.self, getDivFromChannelId(getActiveChatId()))
       let options = Array.from(inviteSelect.querySelectorAll("option"))
       let invited = options.find(option => option.value == message.sender)
