@@ -7,29 +7,20 @@ const chatCard = document.querySelectorAll("div.card")[1]
 const sendBtn = document.querySelector(".input-group-text.send_btn")
 const newChannelBtn = document.querySelector("i.fa-plus")
 const newChannelName = document.querySelector("input.form-control.search")
+const message_counter = document.querySelector("p#message_counter")
 let currentUserId 
 
 document.addEventListener("DOMContentLoaded", () => {
 
   loadAll()
-  sendBtn.addEventListener("click", () => {
-    params = {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        type: "message",
-        body: document.querySelector("textarea.form-control.type_msg").value,
-        user_id: currentUserId,
-        channel_id: getActiveChatId(), 
-        user_secret_id: getSecretIdFromUrl(BASE_URL)
-      })
+  sendBtn.addEventListener("click", () => sendMessage())
+
+  window.addEventListener('keypress', (e) => {
+    if (e.keyCode == 13) {
+      sendMessage()
     }
-    fetch(BASE_URL, params)
-      .then(resp => resp.json())
-      .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
-      .then(document.querySelector("textarea.form-control.type_msg").value = "")
-    
-  })
+  }, false);
+
   newChannelBtn.addEventListener("click", () => {
     params = {
       method: "POST",
@@ -49,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
   })
-  // setInterval(loadAll(), 5000);
+  setInterval(() => loadAll(), 500);
 })
 
 function loadAll() {
@@ -59,6 +50,7 @@ function loadAll() {
       currentUserId = json.self.id
       loadChannels(json)
       loadMessages(json)
+      setActivechat(getActiveChat())
     })
 }
 
@@ -94,6 +86,26 @@ let loadMessages = (json) => {
 
 }
 
+let sendMessage = () => {
+  if (document.querySelector("textarea.form-control.type_msg").value != ""){
+    params = {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        type: "message",
+        body: document.querySelector("textarea.form-control.type_msg").value,
+        user_id: currentUserId,
+        channel_id: getActiveChatId(), 
+        user_secret_id: getSecretIdFromUrl(BASE_URL)
+      })
+    }
+    fetch(BASE_URL, params)
+      .then(resp => resp.json())
+      .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
+      .then(document.querySelector("textarea.form-control.type_msg").value = "")
+  }
+}
+
 let createMessage = (message, self, messageContainer) => {
   let divCont = document.createElement("div")
   let divMsgCont = document.createElement("div")
@@ -121,7 +133,12 @@ let createMessage = (message, self, messageContainer) => {
     span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
   }
   messageContainer.append(divCont)
+  if (messageContainer.id == getActiveChat().id){
+    messageContainer.scrollTop = messageContainer.scrollHeight
+  }
+
   appendGreenSpan(messageContainer.id)
+  last_message_id = message.id
  }
 
  let appendGreenSpan = (id) => {
@@ -159,7 +176,6 @@ let loadChannels = (json) => {
       }
       activeChats = Array.from(channel_list.querySelectorAll("li"))
     })
-    setActivechat(activeChats[0])
     activeChats.forEach(li =>{
       let ch_id = li.id.replace('channel','')
       if (!(json.channels.find(chan => chan.id == ch_id))){
@@ -240,11 +256,17 @@ let updateMessageHeader = (currentChannelListItem = undefined) => {
   else {
     msgHeaderImg.src = currentChannelListItem.querySelector("img").src
     msgHeaderChannel.innerText = currentChannelListItem.querySelector("span").innerText
+    message_counter.innerText = `${countMessages(currentChannelListItem.id)} Messages`
   }
 }
 
+let countMessages = (channel_id) => {
+  let chan = channelCard.querySelector(`#${channel_id}`)
+  return chan.querySelectorAll("div.d-flex.mb-4").length
+}
+
 // Run once here to set to defaults
-updateMessageHeader()
+// updateMessageHeader()
 
 
 // Define variable
