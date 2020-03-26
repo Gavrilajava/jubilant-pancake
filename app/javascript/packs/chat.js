@@ -39,34 +39,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     fetch(BASE_URL, params)
       .then(resp => resp.json())
-      .then(json => {
-        newChannelName.value = null
-      })
+      .then(newChannelName.value = null)
 
     
   })
-  setInterval(() => loadAll(), 1000);
+  // setInterval(() => loadAll(), 500);
 })
 
-function loadAll() {
+let loadAll = () => {
   fetch(BASE_URL+'/'+last_message_id)
     .then(resp => resp.json())
     .then(json => {
       currentUserId = json.self.id
       loadChannels(json)
       loadMessages(json)
-      // setActivechat(getActiveChat())
+      setActiveChat(getActiveChat())
     })
 }
 
 let loadMessages = (json) => {
-  // let activeChannel = getActiveChatId()
-  // let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
   json.channels.forEach(ourChannel => ourChannel.messages.forEach(message => createMessage(message, json.self, getDivFromChannelId(ourChannel.id))))
 }
 
 let sendMessage = () => {
-  if (document.querySelector("textarea.form-control.type_msg").value != null){
+  if (document.querySelector("textarea.form-control.type_msg").value.length > 0){
     params = {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -177,7 +173,7 @@ let displayChannel = (channel) => {
   channelCard.insertBefore(messagesDiv, footer)
   const li = document.createElement("li")
   li.id = `channel${channel.id}`
-  li.addEventListener("click", () => {setActiveChat(li); updateMessageHeader(li);})
+  li.addEventListener("click", () => {setActiveChat(li)})
   const divCont = document.createElement("div")
   divCont.className = "d-flex bd-highlight"
   const imgCont = document.createElement("div")
@@ -237,7 +233,7 @@ let setActiveChat = (li) => {
     else {chatDiv.style.display = ""}
   })
   // Updates the message header to display current channel
-  // updateMessageHeader(li)
+  updateMessageHeader(li)
 }
 
 let updateMessageHeader = (currentChannelListItem) => {

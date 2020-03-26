@@ -32,30 +32,58 @@ class User < ApplicationRecord
     # Each outer array index corresponds to a user's channels (that they have posted in)
     # Each inner array is made of posts made in that channel, after the "last_id"
     def new_messages(last_id)
+        mychannels = self.channels.includes(:owner, :users, messages:[:user])
+        allUsers = User.all.pluck(:name)
+        ch_to_js = mychannels.map { |channel|
+          {
+            title: channel.title,
+            owner: channel.owner.name,
+            image: channel.owner.picture,
+            id: channel.id,
+            nonMembers: allUsers - channel.users.pluck(:name),
+            messages: channel.messages.select{|message| message.id > last_id.to_i}.map{ |message| 
+              {
+              sender: message.user.name,
+              icon: message.user.picture,
+              created: message.created_at,
+              body: message.body,
+              id: message.id
+              }
+            }
+          }
+        }.uniq
         {
           self: {
-          id: self.id,
-          name: self.name,
-          picture: self.picture
+            id: self.id,
+            name: self.name,
+            picture: self.picture
           },
-          channels:
-          self.channels.map { |channel|
-              { title: channel.title,
-                owner: channel.owner.name,
-                image: channel.owner.picture,
-                id: channel.id,
-                # memberCount: channel.members.count,
-                nonMembers: self.users_not_in_channel(channel),
-                messages: channel.messages.includes(:user).select{|message| message.id > last_id.to_i}.map{|message| {
-                  sender: message.user.name,
-                  icon: message.user.picture,
-                  created: message.created_at,
-                  body: message.body,
-                  id: message.id
-                }}
-              }
-          }.uniq
+          channels: ch_to_js
         }
+        # {
+        #   self: {
+        #   id: self.id,
+        #   name: self.name,
+        #   picture: self.picture
+        #   },
+        #   channels:
+        #   self.channels.map { |channel|
+        #       { title: channel.title,
+        #         owner: channel.owner.name,
+        #         image: channel.owner.picture,
+        #         id: channel.id,
+        #         # memberCount: channel.members.count,
+        #         nonMembers: self.users_not_in_channel(channel),
+        #         messages: channel.messages.includes(:user).select{|message| message.id > last_id.to_i}.map{|message| {
+        #           sender: message.user.name,
+        #           icon: message.user.picture,
+        #           created: message.created_at,
+        #           body: message.body,
+        #           id: message.id
+        #         }}
+        #       }
+        #   }.uniq
+        # }
     end
 
 end
