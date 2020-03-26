@@ -175,7 +175,7 @@ let displayChannel = (channel) => {
   channelCard.insertBefore(messagesDiv, footer)
   const li = document.createElement("li")
   li.id = `channel${channel.id}`
-  li.addEventListener("click", () => {setActiveChat(li); updateMessageHeader(li);})
+  li.addEventListener("click", () => {setActiveChat(li); updateMessageHeader(li); actionMenu.style.display = "none";})
   const divCont = document.createElement("div")
   divCont.className = "d-flex bd-highlight"
   const imgCont = document.createElement("div")
