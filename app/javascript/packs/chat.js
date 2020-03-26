@@ -14,12 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadAll()
   sendBtn.addEventListener("click", () => sendMessage())
-
-  window.addEventListener('keypress', (e) => {
-    if (e.keyCode == 13) {
-      sendMessage()
-    }
-  }, false);
+  window.addEventListener('keypress', (e) => (e.keyCode == 13)?sendMessage():false)
 
   newChannelBtn.addEventListener("click", () => {
     params = {
