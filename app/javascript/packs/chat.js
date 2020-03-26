@@ -1,4 +1,5 @@
 const BASE_URL = window.location.href 
+const IMAGES = [".jpg",".png","jpeg", ".gif"]
 let last_message_id = 0
 const channel_list = document.querySelector("ui.contacts")
 const footer = document.querySelector("div#footer_that_needed")
@@ -87,7 +88,9 @@ let createMessage = (message, self, messageContainer) => {
     let divCont = document.createElement("div")
     divCont.id = `message${message.id}`
     let divMsgCont = document.createElement("div")
-    divMsgCont.innerText = message.body
+    let sdfgs = addImageTags(message.body)
+    debugger
+    divMsgCont.innerHTML = addImageTags(message.body)
     let span = document.createElement("span")
     divMsgCont.append(span)
     let imgCont = document.createElement("div")
@@ -117,6 +120,18 @@ let createMessage = (message, self, messageContainer) => {
     appendGreenSpan(messageContainer.id)
     last_message_id = message.id
   }
+}
+
+let addImageTags = (str) => {
+  return str.split(" ").map(word => {
+    debugger
+    if (word.substring(0, 4) === "http" && IMAGES.includes(word.substring(word.length-4))){
+
+      word = `<br><img src ="${word}" class="image_msg"><br>`
+      debugger
+    }
+    return word
+  }).join(" ")
 }
 
  let appendGreenSpan = (id) => {
