@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener('keypress', (e) => {
     if (e.keyCode == 13) {
+      e.preventDefault()
       sendMessage()
     }
   }, false);
@@ -39,14 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(BASE_URL, params)
       .then(resp => resp.json())
       .then(json => {
-        newChannelName.value = ""
-        displayChannel(json.channel)
-        createMessage(json.message, json.self, getDivFromChannelId(json.channel.id))
+        newChannelName.value = null
       })
 
     
   })
-  // setInterval(() => loadAll(), 500);
+  setInterval(() => loadAll(), 1000);
 })
 
 function loadAll() {
@@ -56,7 +55,7 @@ function loadAll() {
       currentUserId = json.self.id
       loadChannels(json)
       loadMessages(json)
-      setActivechat(getActiveChat())
+      // setActivechat(getActiveChat())
     })
 }
 
@@ -67,7 +66,7 @@ let loadMessages = (json) => {
 }
 
 let sendMessage = () => {
-  if (document.querySelector("textarea.form-control.type_msg").value != ""){
+  if (document.querySelector("textarea.form-control.type_msg").value != null){
     params = {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -82,44 +81,47 @@ let sendMessage = () => {
     fetch(BASE_URL, params)
       .then(resp => resp.json())
       .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
-      .then(document.querySelector("textarea.form-control.type_msg").value = "")
+    document.querySelector("textarea.form-control.type_msg").value = null
+    
   }
 }
 
 let createMessage = (message, self, messageContainer) => {
-  let divCont = document.createElement("div")
-  let divMsgCont = document.createElement("div")
-  divMsgCont.innerText = message.body
-  let span = document.createElement("span")
-  divMsgCont.append(span)
-  let imgCont = document.createElement("div")
-  let img = document.createElement("img")
-  imgCont.className = "img_cont_msg"
-  img.className = "rounded-circle user_img_msg"
-  img.src = message.icon
-  imgCont.append(img)
-  if (message.sender === self.name){
-    divCont.className = "d-flex justify-content-end mb-4"
-    divMsgCont.className = "msg_cotainer_send"
-    span.className = "msg_time_send"
-    divCont.append(divMsgCont, imgCont)
-    span.innerText = `sent at: ${(new Date(message.created)).toLocaleString()}`
+  if (!document.getElementById(`message${message.id}`)){
+    let divCont = document.createElement("div")
+    divCont.id = `message${message.id}`
+    let divMsgCont = document.createElement("div")
+    divMsgCont.innerText = message.body
+    let span = document.createElement("span")
+    divMsgCont.append(span)
+    let imgCont = document.createElement("div")
+    let img = document.createElement("img")
+    imgCont.className = "img_cont_msg"
+    img.className = "rounded-circle user_img_msg"
+    img.src = message.icon
+    imgCont.append(img)
+    if (message.sender === self.name){
+      divCont.className = "d-flex justify-content-end mb-4"
+      divMsgCont.className = "msg_cotainer_send"
+      span.className = "msg_time_send"
+      divCont.append(divMsgCont, imgCont)
+      span.innerText = `sent at: ${(new Date(message.created)).toLocaleString()}`
+    }
+    else{
+      divCont.className = "d-flex justify-content-start mb-4"
+      divMsgCont.className = "msg_cotainer"
+      span.className = "msg_time"
+      divCont.append(imgCont, divMsgCont)
+      span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
+    }
+    messageContainer.append(divCont)
+    if (messageContainer.id == getActiveChat().id){
+      messageContainer.scrollTop = messageContainer.scrollHeight
+    }
+    appendGreenSpan(messageContainer.id)
+    last_message_id = message.id
   }
-  else{
-    divCont.className = "d-flex justify-content-start mb-4"
-    divMsgCont.className = "msg_cotainer"
-    span.className = "msg_time"
-    divCont.append(imgCont, divMsgCont)
-    span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
-  }
-  messageContainer.append(divCont)
-  if (messageContainer.id == getActiveChat().id){
-    messageContainer.scrollTop = messageContainer.scrollHeight
-  }
-
-  appendGreenSpan(messageContainer.id)
-  last_message_id = message.id
- }
+}
 
  let appendGreenSpan = (id) => {
    let channelLine = checkIfItAlreadyThere(id)

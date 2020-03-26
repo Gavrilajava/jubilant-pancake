@@ -54,7 +54,7 @@ class User < ApplicationRecord
                   id: message.id
                 }}
               }
-            }.uniq
+          }.uniq
         }
     end
 
