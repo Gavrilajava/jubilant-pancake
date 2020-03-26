@@ -46,6 +46,9 @@ def invite
   end
 end
 
+def users
+end
+
 private
 
 

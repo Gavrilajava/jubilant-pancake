@@ -9,7 +9,7 @@ class Channel < ApplicationRecord
         "title": self.title,
         "owner": self.owner.name,
         "image": self.owner.picture,
-        "id": self.id,
+        "id": self.id
       },
       message: {
         "sender": self.owner.name,
