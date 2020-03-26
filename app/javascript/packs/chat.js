@@ -7,7 +7,12 @@ const chatCard = document.querySelectorAll("div.card")[1]
 const sendBtn = document.querySelector(".input-group-text.send_btn")
 const newChannelBtn = document.querySelector("i.fa-plus")
 const newChannelName = document.querySelector("input.form-control.search")
-let currentUserId 
+let currentUserId
+let msgHeader = document.querySelector(".card-header.msg_head")
+let msgHeaderContent = msgHeader.querySelector(".d-flex.bd-highlight")
+let msgHeaderImg = msgHeaderContent.querySelector(".rounded-circle.user_img")
+let msgHeaderChannel = msgHeaderContent.querySelector(".user_info span")
+let msgHeaderMsgCount = msgHeaderContent.querySelector(".user_info p")
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -62,36 +67,10 @@ function loadAll() {
     })
 }
 
-
 let loadMessages = (json) => {
   // let activeChannel = getActiveChatId()
   // let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
   json.channels.forEach(ourChannel => ourChannel.messages.forEach(message => createMessage(message, json.self, getDivFromChannelId(ourChannel.id))))
-  
-
-// Styling when sender is not self
-// <div class="d-flex justify-content-start mb-4">
-//  <div class="img_cont_msg">
-//  <img src="" class="rounded-circle user_img_msg">
-//  </div>
-//  <div class="msg_cotainer">
-//    Hi, how are you samim?
-//    <span class="msg_time">8:40 AM, Today</span>
-//  </div>
-// </div>
-
-// Styling when sender is self
-// <div class="d-flex justify-content-end mb-4">
-// 	<div class="msg_cotainer_send">
-// 		Hi Khalid i am good tnx how about you?
-// 		<span class="msg_time_send">8:55 AM, Today</span>
-//   </div>
-// 	<div class="img_cont_msg">
-// 		<img src="http://picsum.photos/200" class="rounded-circle user_img_msg">
-// 	</div>
-// </div>
-
-
 }
 
 let createMessage = (message, self, messageContainer) => {
@@ -151,15 +130,19 @@ let createMessage = (message, self, messageContainer) => {
  }
 
 let loadChannels = (json) => {
-    let activeChats = Array.from(channel_list.querySelectorAll("li"))
+    let activeChats = Array.from(channel_list.querySelectorAll("li"))  
+
     json.channels.forEach(channel => {
       let li = activeChats.find(item => item.id == `channel${channel.id}`)
       if (!li){
         displayChannel(channel)
       }
       activeChats = Array.from(channel_list.querySelectorAll("li"))
+
     })
-    setActivechat(activeChats[0])
+    setActiveChat(activeChats[0])
+    updateMessageHeader(activeChats[0])
+
     activeChats.forEach(li =>{
       let ch_id = li.id.replace('channel','')
       if (!(json.channels.find(chan => chan.id == ch_id))){
@@ -176,7 +159,7 @@ let displayChannel = (channel) => {
   channelCard.insertBefore(messagesDiv, footer)
   const li = document.createElement("li")
   li.id = `channel${channel.id}`
-  li.addEventListener("click", () => setActivechat(li))
+  li.addEventListener("click", () => {setActiveChat(li); updateMessageHeader(li);})
   const divCont = document.createElement("div")
   divCont.className = "d-flex bd-highlight"
   const imgCont = document.createElement("div")
@@ -194,6 +177,18 @@ let displayChannel = (channel) => {
   chnlInfo.append(span, p)
   divCont.append(imgCont, chnlInfo)
   li.append(divCont)
+//
+  let nonMembers = document.querySelector(`#channel_${channel.id}_nonmembers`)
+  if(nonMembers == undefined){
+    nonMembers = document.createElement("p")
+    nonMembers.style.display = "none"
+    nonMembers.id = `#channel_${channel.id}_nonmembers`
+    li.append(nonMembers)
+  }
+  if (nonMembers.innerText != channel.nonMembers){
+    nonMembers.innerText = channel.nonMembers
+  }
+// 
   channel_list.append(li)
 }
 
@@ -212,7 +207,7 @@ let resetActiveChat = () => {
   if (!!activeChat) { activeChat.className = ""}
 }
 
-let setActivechat = (li) => {
+let setActiveChat = (li) => {
   resetActiveChat()
   li.className = "active"
   deleteGreenSpan(li)
@@ -224,14 +219,10 @@ let setActivechat = (li) => {
     else {chatDiv.style.display = ""}
   })
   // Updates the message header to display current channel
-  updateMessageHeader(li)
+  // updateMessageHeader(li)
 }
 
-let updateMessageHeader = (currentChannelListItem = undefined) => {
-  let msgHeader = document.querySelector(".card-header.msg_head")
-  let msgHeaderContent = msgHeader.querySelector(".d-flex.bd-highlight")
-  let msgHeaderImg = msgHeaderContent.querySelector(".rounded-circle.user_img")
-  let msgHeaderChannel = msgHeaderContent.querySelector(".user_info span")
+let updateMessageHeader = (currentChannelListItem) => {
 
   if(currentChannelListItem == undefined) {
     msgHeaderImg.src = "http://picsum.photos/202"
@@ -240,23 +231,42 @@ let updateMessageHeader = (currentChannelListItem = undefined) => {
   else {
     msgHeaderImg.src = currentChannelListItem.querySelector("img").src
     msgHeaderChannel.innerText = currentChannelListItem.querySelector("span").innerText
+    let activeChannelId = getActiveChat().id
+    let activeMsgBody = document.querySelectorAll(`#${activeChannelId}.card-body.msg_card_body`)
+    let messageCount = activeMsgBody[0].childElementCount
+    msgHeaderMsgCount.innerText = `${messageCount} messages`
   }
 }
 
 // Run once here to set to defaults
-updateMessageHeader()
 
 
-// Define variable
+// Select action menu elements
 let actionMenuBtn = document.querySelector("span#action_menu_btn")
 let actionMenu = document.querySelector(".action_menu")
 let actionMenuItem = actionMenu.querySelector("li")
+
 let toggleInviteBox = () => {
     actionMenu.style.display == "none" ? actionMenu.style.display = "block" : actionMenu.style.display = "none"
 }
 
-actionMenuBtn.addEventListener("click", () => {toggleInviteBox()})
+let inviteSelect = document.querySelector("#invite-select")
 
+let listChannelUsers = () => {
+  let nonMemberString = document.querySelectorAll(".active p")[1].innerText
+  let nonMembers = nonMemberString.split(", ")
+  inviteSelect.innerHTML = '<option value="">Select a user to invite</option>'
+  if(nonMembers.length > 1) {
+    nonMembers.forEach(nonMember => {
+      let option = document.createElement("option")
+      option.value = nonMember
+      option.innerText = nonMember
+      inviteSelect.append(option)
+    })
+  }
+}
+
+actionMenuBtn.addEventListener("click", () => {toggleInviteBox(); listChannelUsers()})
 
 let getDivFromChannelId = (id) => Array.from(channelCard.querySelectorAll("div.card-body.msg_card_body")).find(chatDiv => chatDiv.id == `channel${id}`)
 
@@ -265,3 +275,4 @@ let getSecretIdFromUrl = (url) => {
   let arr = url.split('/')
   return arr[arr.length -1]
 }
+

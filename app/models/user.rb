@@ -19,6 +19,15 @@ class User < ApplicationRecord
         end
     end
 
+    def all_users_as_string
+        user_array = User.all.map{|user| user.name}
+        return user_array.join(", ")
+    end
+
+    def users_not_in_channel(channel)
+        (User.all - channel.users).map{|user| user.name}.join(", ")
+    end
+
 # Passes in a post's id and returns new posts related to a user's channels.
     # Each outer array index corresponds to a user's channels (that they have posted in)
     # Each inner array is made of posts made in that channel, after the "last_id"
@@ -35,6 +44,8 @@ class User < ApplicationRecord
                 owner: channel.owner.name,
                 image: channel.owner.picture,
                 id: channel.id,
+                # memberCount: channel.members.count,
+                nonMembers: self.users_not_in_channel(channel),
                 messages: channel.messages.includes(:user).select{|message| message.id > last_id.to_i}.map{|message| {
                   sender: message.user.name,
                   icon: message.user.picture,
