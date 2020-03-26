@@ -13,28 +13,20 @@ let msgHeaderContent = msgHeader.querySelector(".d-flex.bd-highlight")
 let msgHeaderImg = msgHeaderContent.querySelector(".rounded-circle.user_img")
 let msgHeaderChannel = msgHeaderContent.querySelector(".user_info span")
 let msgHeaderMsgCount = msgHeaderContent.querySelector(".user_info p")
+const message_counter = document.querySelector("p#message_counter")
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
   loadAll()
-  sendBtn.addEventListener("click", () => {
-    params = {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        type: "message",
-        body: document.querySelector("textarea.form-control.type_msg").value,
-        user_id: currentUserId,
-        channel_id: getActiveChatId(), 
-        user_secret_id: getSecretIdFromUrl(BASE_URL)
-      })
+  sendBtn.addEventListener("click", () => sendMessage())
+
+  window.addEventListener('keypress', (e) => {
+    if (e.keyCode == 13) {
+      sendMessage()
     }
-    fetch(BASE_URL, params)
-      .then(resp => resp.json())
-      .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
-      .then(document.querySelector("textarea.form-control.type_msg").value = "")
-    
-  })
+  }, false);
+
   newChannelBtn.addEventListener("click", () => {
     params = {
       method: "POST",
@@ -54,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
   })
-  // setInterval(loadAll(), 5000);
+  setInterval(() => loadAll(), 500);
 })
 
 function loadAll() {
@@ -64,6 +56,7 @@ function loadAll() {
       currentUserId = json.self.id
       loadChannels(json)
       loadMessages(json)
+      setActivechat(getActiveChat())
     })
 }
 
@@ -71,6 +64,26 @@ let loadMessages = (json) => {
   // let activeChannel = getActiveChatId()
   // let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
   json.channels.forEach(ourChannel => ourChannel.messages.forEach(message => createMessage(message, json.self, getDivFromChannelId(ourChannel.id))))
+}
+
+let sendMessage = () => {
+  if (document.querySelector("textarea.form-control.type_msg").value != ""){
+    params = {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        type: "message",
+        body: document.querySelector("textarea.form-control.type_msg").value,
+        user_id: currentUserId,
+        channel_id: getActiveChatId(), 
+        user_secret_id: getSecretIdFromUrl(BASE_URL)
+      })
+    }
+    fetch(BASE_URL, params)
+      .then(resp => resp.json())
+      .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
+      .then(document.querySelector("textarea.form-control.type_msg").value = "")
+  }
 }
 
 let createMessage = (message, self, messageContainer) => {
@@ -100,7 +113,12 @@ let createMessage = (message, self, messageContainer) => {
     span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
   }
   messageContainer.append(divCont)
+  if (messageContainer.id == getActiveChat().id){
+    messageContainer.scrollTop = messageContainer.scrollHeight
+  }
+
   appendGreenSpan(messageContainer.id)
+  last_message_id = message.id
  }
 
  let appendGreenSpan = (id) => {
@@ -140,8 +158,6 @@ let loadChannels = (json) => {
       activeChats = Array.from(channel_list.querySelectorAll("li"))
 
     })
-    setActiveChat(activeChats[0])
-    updateMessageHeader(activeChats[0])
 
     activeChats.forEach(li =>{
       let ch_id = li.id.replace('channel','')
@@ -235,10 +251,16 @@ let updateMessageHeader = (currentChannelListItem) => {
     let activeMsgBody = document.querySelectorAll(`#${activeChannelId}.card-body.msg_card_body`)
     let messageCount = activeMsgBody[0].childElementCount
     msgHeaderMsgCount.innerText = `${messageCount} messages`
+    message_counter.innerText = `${countMessages(currentChannelListItem.id)} Messages`
   }
 }
 
-// Run once here to set to defaults
+let countMessages = (channel_id) => {
+  let chan = channelCard.querySelector(`#${channel_id}`)
+  return chan.querySelectorAll("div.d-flex.mb-4").length
+}
+
+
 
 
 // Select action menu elements
