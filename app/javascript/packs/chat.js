@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
   })
-  setInterval(() => loadAll(), 500);
+  // setInterval(() => loadAll(), 500);
 })
 
 function loadAll() {
@@ -273,6 +273,7 @@ let toggleInviteBox = () => {
 }
 
 let inviteSelect = document.querySelector("#invite-select")
+let inviteBtn = document.querySelector("i#invite-user")
 
 let listChannelUsers = () => {
   let nonMemberString = document.querySelectorAll(".active p")[1].innerText
@@ -287,6 +288,26 @@ let listChannelUsers = () => {
     })
   }
 }
+inviteBtn.addEventListener("click", () => {
+  let params = {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      type: "invite",
+      user: inviteSelect.value,
+      channel: getActiveChatId()
+    })
+  }
+  fetch(BASE_URL, params)
+    .then(resp => resp.json())
+    .then(message => {
+      debugger
+      createMessage(message, message.self, getDivFromChannelId(getActiveChatId()))
+      let options = Array.from(inviteSelect.querySelectorAll("option"))
+      let invited = options.find(option => option.value == message.sender)
+      invited.remove()
+    })
+})
 
 actionMenuBtn.addEventListener("click", () => {toggleInviteBox(); listChannelUsers()})
 

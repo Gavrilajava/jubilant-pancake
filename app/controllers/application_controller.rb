@@ -18,13 +18,24 @@ def new_message
   if params[:type] == "message"
     user = User.find_by(secret_id: params[:user_secret_id])
     message = Message.create(user_id: user.id, channel_id: params[:channel_id], body: params[:body])
-    render json: message.to_js
+    render json: message.to_js(user)
   elsif params[:type] == "channel"
     user = User.find_by(secret_id: params[:user_secret_id])
     if user
       channel = Channel.create(owner: user, title: params[:title])
-      message = Message.create(user_id: user.id, channel_id: channel.id, body: "#{user.name} created that channel")
+      message = Message.create(user_id: user.id, channel_id: channel.id, body: "#{user.name} created this channel")
       render json: channel.to_js
+    end
+  elsif params[:type] == "invite"
+
+    current_user = User.find_by(secret_id: params[:user_secret_id])
+    channel = Channel.find(params[:channel])
+    if channel.owner == current_user
+      invited_user = User.find_by(name: params[:user])
+      if invited_user
+        message = Message.create(user_id: invited_user.id, channel_id: channel.id, body: "#{invited_user.name} joined this channel")
+        render json: message.to_js(current_user)
+      end
     end
   end
 end

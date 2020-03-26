@@ -2,11 +2,11 @@ class Message < ApplicationRecord
   belongs_to :user
   belongs_to :channel
 
-  def to_js
+  def to_js(usr)
     {
       "self": {
-        name: self.user.name,
-        id: self.user.id
+        name: usr.name,
+        id: usr.id
       },
       "icon": self.user.picture,
       "created": self.created_at,
