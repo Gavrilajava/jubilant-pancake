@@ -252,7 +252,8 @@ margin-bottom: 15px !important;
   background-color: #ffffffdd;
   border: solid #00000019;
   border-radius: 5px;
-
+}
 .image_msg {
-  width: 15vw;
+  width: 10vw;
+  max-width: 15vw;
 }

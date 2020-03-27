@@ -96,6 +96,7 @@ let sendMessage = () => {
   }
 }
 
+
 let createMessage = (message, self, messageContainer) => {
   if (!document.getElementById(`message${message.id}`)){
     let divCont = document.createElement("div")
