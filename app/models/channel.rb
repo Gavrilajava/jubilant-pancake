@@ -4,7 +4,7 @@ class Channel < ApplicationRecord
   has_many :users, through: :messages
 
   def nonMembers
-    (User.all - self.users).map{|user| user.name}.join(", ")
+    (User.all - self.users).map{|user| user.name}.join(",")
   end
 
 

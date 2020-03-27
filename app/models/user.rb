@@ -25,7 +25,7 @@ class User < ApplicationRecord
     end
 
     def users_not_in_channel(channel)
-        (User.all - channel.users).map{|user| user.name}.join(", ")
+        (User.all - channel.users).map{|user| user.name}.join(",")
     end
 
 # Passes in a post's id and returns new posts related to a user's channels.

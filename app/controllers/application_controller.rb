@@ -32,7 +32,7 @@ def new_message
     channel = Channel.find(params[:channel])
     if channel.owner == current_user
       invited_user = User.find_by(name: params[:user])
-      if invited_user
+      if invited_user && !channel.users.include?(invited_user)
         message = Message.create(user_id: invited_user.id, channel_id: channel.id, body: "#{invited_user.name} joined this channel")
         render json: message.to_js(current_user)
       end

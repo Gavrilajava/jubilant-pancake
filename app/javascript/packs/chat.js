@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
   })
-  // setInterval(() => loadAll(), 500);
+  setInterval(() => loadAll(), 500);
 })
 
 let loadAll = () => {
@@ -56,7 +56,7 @@ let loadAll = () => {
       loadChannels(json)
       loadMessages(json)
       setActiveChat(getActiveChat())
-      playSound(json)
+      // playSound(json)
     })
 }
 
@@ -301,8 +301,9 @@ let inviteDataList = document.querySelector("#inviteDataList")
 
 let listChannelUsers = () => {
   let nonMemberString = document.querySelectorAll(".active p")[1].innerText
-  let nonMembers = nonMemberString.split(", ")
+  let nonMembers = nonMemberString.split(",")
   inviteDataList.innerHTML = ""
+  debugger
   if(nonMembers.length > 1) {
     inviteSelect.placeholder = "Invite a user"
     inviteBtn.style.display = "inline-block"
@@ -343,7 +344,7 @@ inviteBtn.addEventListener("click", () => {
     actionMenu.style.display = "none"
 })
 
-actionMenuBtn.addEventListener("click", () => {toggleInviteBox(); listChannelUsers()})
+actionMenuBtn.addEventListener("click", () => {listChannelUsers(); toggleInviteBox(); })
 
 let getDivFromChannelId = (id) => Array.from(channelCard.querySelectorAll("div.card-body.msg_card_body")).find(chatDiv => chatDiv.id == `channel${id}`)
 
