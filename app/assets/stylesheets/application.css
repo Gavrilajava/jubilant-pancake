@@ -212,11 +212,11 @@ font-size: 20px;
 z-index: 1;
 position: absolute;
 padding: 15px 0;
-background-color: rgba(0,0,0,0.5);
+background-color: rgba(0,0,0,0.3);
 color: white;
 border-radius: 15px;
 top: 5px;
-right: 25px;
+right: 50px;
 display: none;
 }
 .action_menu ul{
@@ -233,10 +233,10 @@ margin-bottom: 5px;
 padding-right: 10px;
 
 }
-.action_menu ul li:hover{
+/* .action_menu ul li:hover{
 cursor: pointer;
 background-color: rgba(0,0,0,0.2);
-}
+} */
 @media(max-width: 576px){
 .contacts_card{
 margin-bottom: 15px !important;
@@ -247,7 +247,12 @@ margin-bottom: 15px !important;
   background-color: rgba(0,0,0,.03)
 }
 
+
+.action_menu input[list] {
+  background-color: #ffffffdd;
+  border: solid #00000019;
+  border-radius: 5px;
+
 .image_msg {
   width: 15vw;
- 
 }

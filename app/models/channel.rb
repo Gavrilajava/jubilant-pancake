@@ -3,13 +3,19 @@ class Channel < ApplicationRecord
   has_many :messages
   has_many :users, through: :messages
 
+  def nonMembers
+    (User.all - self.users).map{|user| user.name}.join(", ")
+  end
+
+
   def to_js
     {
       channel: {
         "title": self.title,
         "owner": self.owner.name,
         "image": self.owner.picture,
-        "id": self.id
+        "id": self.id,
+        "nonMembers": self.nonMembers
       },
       message: {
         "sender": self.owner.name,

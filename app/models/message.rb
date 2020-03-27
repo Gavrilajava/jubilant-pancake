@@ -8,6 +8,9 @@ class Message < ApplicationRecord
         name: usr.name,
         id: usr.id
       },
+      "channel": {
+        nonMembers: usr.users_not_in_channel(self.channel),
+      },
       "icon": self.user.picture,
       "created": self.created_at,
       "body": self.body,

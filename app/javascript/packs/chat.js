@@ -196,7 +196,9 @@ let displayChannel = (channel) => {
   channelCard.insertBefore(messagesDiv, footer)
   const li = document.createElement("li")
   li.id = `channel${channel.id}`
-  li.addEventListener("click", () => {setActiveChat(li)})
+
+  li.addEventListener("click", () => {setActiveChat(li); actionMenu.style.display = "none";})
+
   const divCont = document.createElement("div")
   divCont.className = "d-flex bd-highlight"
   const imgCont = document.createElement("div")
@@ -290,23 +292,30 @@ let actionMenu = document.querySelector(".action_menu")
 let actionMenuItem = actionMenu.querySelector("li")
 
 let toggleInviteBox = () => {
-    actionMenu.style.display == "none" ? actionMenu.style.display = "block" : actionMenu.style.display = "none"
+    actionMenu.style.display == "block" ? actionMenu.style.display = "none" : actionMenu.style.display = "block"
 }
 
-let inviteSelect = document.querySelector("#invite-select")
 let inviteBtn = document.querySelector("i#invite-user")
+let inviteSelect = document.querySelector("#invite-select")
+let inviteDataList = document.querySelector("#inviteDataList")
 
 let listChannelUsers = () => {
   let nonMemberString = document.querySelectorAll(".active p")[1].innerText
   let nonMembers = nonMemberString.split(", ")
-  inviteSelect.innerHTML = '<option value="">Select a user to invite</option>'
+  inviteDataList.innerHTML = ""
   if(nonMembers.length > 1) {
+    inviteSelect.placeholder = "Invite a user"
+    inviteBtn.style.display = "inline-block"
     nonMembers.forEach(nonMember => {
       let option = document.createElement("option")
       option.value = nonMember
       option.innerText = nonMember
-      inviteSelect.append(option)
+      inviteDataList.append(option)
     })
+  }
+  else{
+    inviteSelect.placeholder = "Everyone is here!"
+    inviteBtn.style.display = "none"
   }
 }
 inviteBtn.addEventListener("click", () => {
@@ -325,8 +334,13 @@ inviteBtn.addEventListener("click", () => {
       createMessage(message, message.self, getDivFromChannelId(getActiveChatId()))
       let options = Array.from(inviteSelect.querySelectorAll("option"))
       let invited = options.find(option => option.value == message.sender)
+      let nonMembers = document.querySelectorAll(".active p")[1]
+      nonMembers.innerText = message.channel.nonMembers
+      listChannelUsers()
       invited.remove()
     })
+    inviteSelect.value = ""
+    actionMenu.style.display = "none"
 })
 
 actionMenuBtn.addEventListener("click", () => {toggleInviteBox(); listChannelUsers()})
