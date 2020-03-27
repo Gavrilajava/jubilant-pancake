@@ -247,8 +247,12 @@ margin-bottom: 15px !important;
   background-color: rgba(0,0,0,.03)
 }
 
+
 .action_menu input[list] {
   background-color: #ffffffdd;
   border: solid #00000019;
   border-radius: 5px;
+
+.image_msg {
+  width: 15vw;
 }

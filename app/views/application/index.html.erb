@@ -21,12 +21,14 @@
 						<div class="card-header msg_head">
 							<div class="d-flex bd-highlight">
 								<div class="img_cont">
-									<img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+									<img src="<%= asset_path('avatars') %>" class="rounded-circle user_img">
 									<span class="online_icon"></span>
 								</div>
 								<div class="user_info">
 									<span>Runtime Terror</span>
-									<p id="message_counter">1337 Messages</p>
+
+									<p id="message_counter">A shitload of Messages will be loaded soon!</p>
+
 								</div>
 							</div>
 							<span id="action_menu_btn"><i class="fa fa-address-card"></i></span>
@@ -41,7 +43,8 @@
 								</ul>
 							</div>
 						</div>
-				
+            <div class="card-body msg_card_body" style="">
+            </div>
 						<div class="card-footer" id = "footer_that_needed" >
 							<div class="input-group">
 								<div class="input-group-append">
@@ -57,6 +60,12 @@
 				</div>
 			</div>
 		</div>
+
+<audio id = "messageSound">
+
+  <source src="<%= asset_path('intuition.mp3') %>" type="audio/mpeg">
+
+</audio>
 
 <%= javascript_pack_tag 'chat', "data-turbolinks-track": true  %>
 

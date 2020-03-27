@@ -1,4 +1,5 @@
 const BASE_URL = window.location.href 
+const IMAGES = [".jpg",".png","jpeg", ".gif"]
 let last_message_id = 0
 const channel_list = document.querySelector("ui.contacts")
 const footer = document.querySelector("div#footer_that_needed")
@@ -14,6 +15,7 @@ let msgHeaderImg = msgHeaderContent.querySelector(".rounded-circle.user_img")
 let msgHeaderChannel = msgHeaderContent.querySelector(".user_info span")
 let msgHeaderMsgCount = msgHeaderContent.querySelector(".user_info p")
 const message_counter = document.querySelector("p#message_counter")
+const newSound = document.querySelector("#messageSound")
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -23,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener('keypress', (e) => {
     if (e.keyCode == 13) {
+      e.preventDefault()
       sendMessage()
     }
   }, false);
@@ -38,36 +41,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     fetch(BASE_URL, params)
       .then(resp => resp.json())
-      .then(json => {
-        newChannelName.value = ""
-        displayChannel(json.channel)
-        createMessage(json.message, json.self, getDivFromChannelId(json.channel.id))
-      })
+      .then(newChannelName.value = null)
 
     
   })
   // setInterval(() => loadAll(), 500);
 })
 
-function loadAll() {
+let loadAll = () => {
   fetch(BASE_URL+'/'+last_message_id)
     .then(resp => resp.json())
     .then(json => {
       currentUserId = json.self.id
       loadChannels(json)
       loadMessages(json)
-      setActivechat(getActiveChat())
+      setActiveChat(getActiveChat())
+      playSound(json)
     })
 }
 
 let loadMessages = (json) => {
-  // let activeChannel = getActiveChatId()
-  // let ourChannel = json.channels.find(jsonChannel => jsonChannel.id == activeChannel)
   json.channels.forEach(ourChannel => ourChannel.messages.forEach(message => createMessage(message, json.self, getDivFromChannelId(ourChannel.id))))
 }
 
+let playSound = (json) => {
+  if (json.channels.some(channel => (channel.id != getActiveChatId() && channel.messages.length > 0))){
+    try{
+    newSound.play()
+    }
+    catch {
+      console.log("Something happened")
+    }
+  }
+}
+
 let sendMessage = () => {
-  if (document.querySelector("textarea.form-control.type_msg").value != ""){
+  if (document.querySelector("textarea.form-control.type_msg").value.length > 0){
     params = {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -82,44 +91,56 @@ let sendMessage = () => {
     fetch(BASE_URL, params)
       .then(resp => resp.json())
       .then(message => createMessage(message, message.self, getDivFromChannelId(message.channel_id)))
-      .then(document.querySelector("textarea.form-control.type_msg").value = "")
+    document.querySelector("textarea.form-control.type_msg").value = null
+    
   }
 }
 
 let createMessage = (message, self, messageContainer) => {
-  let divCont = document.createElement("div")
-  let divMsgCont = document.createElement("div")
-  divMsgCont.innerText = message.body
-  let span = document.createElement("span")
-  divMsgCont.append(span)
-  let imgCont = document.createElement("div")
-  let img = document.createElement("img")
-  imgCont.className = "img_cont_msg"
-  img.className = "rounded-circle user_img_msg"
-  img.src = message.icon
-  imgCont.append(img)
-  if (message.sender === self.name){
-    divCont.className = "d-flex justify-content-end mb-4"
-    divMsgCont.className = "msg_cotainer_send"
-    span.className = "msg_time_send"
-    divCont.append(divMsgCont, imgCont)
-    span.innerText = `sent at: ${(new Date(message.created)).toLocaleString()}`
+  if (!document.getElementById(`message${message.id}`)){
+    let divCont = document.createElement("div")
+    divCont.id = `message${message.id}`
+    let divMsgCont = document.createElement("div")
+    divMsgCont.innerHTML = addImageTags(message.body)
+    let span = document.createElement("span")
+    divMsgCont.append(span)
+    let imgCont = document.createElement("div")
+    let img = document.createElement("img")
+    imgCont.className = "img_cont_msg"
+    img.className = "rounded-circle user_img_msg"
+    img.src = message.icon
+    imgCont.append(img)
+    if (message.sender === self.name){
+      divCont.className = "d-flex justify-content-end mb-4"
+      divMsgCont.className = "msg_cotainer_send"
+      span.className = "msg_time_send"
+      divCont.append(divMsgCont, imgCont)
+      span.innerText = `sent at: ${(new Date(message.created)).toLocaleString()}`
+    }
+    else{
+      divCont.className = "d-flex justify-content-start mb-4"
+      divMsgCont.className = "msg_cotainer"
+      span.className = "msg_time"
+      divCont.append(imgCont, divMsgCont)
+      span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
+    }
+    messageContainer.append(divCont)
+    if (messageContainer.id == getActiveChat().id){
+      messageContainer.scrollTop = messageContainer.scrollHeight
+    }
+    appendGreenSpan(messageContainer.id)
+    last_message_id = message.id
   }
-  else{
-    divCont.className = "d-flex justify-content-start mb-4"
-    divMsgCont.className = "msg_cotainer"
-    span.className = "msg_time"
-    divCont.append(imgCont, divMsgCont)
-    span.innerText = `${message.sender} sent at: ${(new Date(message.created)).toLocaleString()}`
-  }
-  messageContainer.append(divCont)
-  if (messageContainer.id == getActiveChat().id){
-    messageContainer.scrollTop = messageContainer.scrollHeight
-  }
+}
 
-  appendGreenSpan(messageContainer.id)
-  last_message_id = message.id
- }
+let addImageTags = (str) => {
+  return str.split(" ").map(word => {
+    if (word.substring(0, 4) === "http" && IMAGES.includes(word.substring(word.length-4))){
+      word = `<br><img src ="${word}" class="image_msg"><br>`
+    }
+    return word
+  }).join(" ")
+}
 
  let appendGreenSpan = (id) => {
    let channelLine = checkIfItAlreadyThere(id)
@@ -175,7 +196,9 @@ let displayChannel = (channel) => {
   channelCard.insertBefore(messagesDiv, footer)
   const li = document.createElement("li")
   li.id = `channel${channel.id}`
-  li.addEventListener("click", () => {setActiveChat(li); updateMessageHeader(li); actionMenu.style.display = "none";})
+
+  li.addEventListener("click", () => {setActiveChat(li); actionMenu.style.display = "none";})
+
   const divCont = document.createElement("div")
   divCont.className = "d-flex bd-highlight"
   const imgCont = document.createElement("div")
@@ -235,7 +258,7 @@ let setActiveChat = (li) => {
     else {chatDiv.style.display = ""}
   })
   // Updates the message header to display current channel
-  // updateMessageHeader(li)
+  updateMessageHeader(li)
 }
 
 let updateMessageHeader = (currentChannelListItem) => {
