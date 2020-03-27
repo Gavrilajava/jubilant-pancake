@@ -35,6 +35,8 @@ def new_message
       if invited_user && !channel.users.include?(invited_user)
         message = Message.create(user_id: invited_user.id, channel_id: channel.id, body: "#{invited_user.name} joined this channel")
         render json: message.to_js(current_user)
+      else
+        render json: {sender: nil}
       end
     end
   end

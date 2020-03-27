@@ -13,6 +13,7 @@ class Channel < ApplicationRecord
       channel: {
         "title": self.title,
         "owner": self.owner.name,
+        "owner_id": self.owner.id,
         "image": self.owner.picture,
         "id": self.id,
         "nonMembers": self.nonMembers
