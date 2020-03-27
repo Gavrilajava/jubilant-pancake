@@ -206,6 +206,7 @@ let displayChannel = (channel) => {
   imgCont.className = "img_cont"
   const img = document.createElement("img")
   img.src = channel.image
+  img.id = channel.owner_id
   img.className = "rounded-circle user_img"
   imgCont.append(img)
   chnlInfo = document.createElement("div")
@@ -276,6 +277,12 @@ let updateMessageHeader = (currentChannelListItem) => {
     let messageCount = activeMsgBody[0].childElementCount
     msgHeaderMsgCount.innerText = `${messageCount} messages`
     message_counter.innerText = `${countMessages(currentChannelListItem.id)} Messages`
+    if (currentUserId == currentChannelListItem.querySelector("img").id){
+      actionMenuBtn.style.display = "block"
+    }
+    else{
+      actionMenuBtn.style.display = "none"
+    }
   }
 }
 
@@ -304,7 +311,6 @@ let listChannelUsers = () => {
   let nonMemberString = document.querySelectorAll(".active p")[1].innerText
   let nonMembers = nonMemberString.split(",")
   inviteDataList.innerHTML = ""
-  debugger
   if(nonMembers.length > 1) {
     inviteSelect.placeholder = "Invite a user"
     inviteBtn.style.display = "inline-block"
@@ -333,6 +339,7 @@ inviteBtn.addEventListener("click", () => {
   fetch(BASE_URL, params)
     .then(resp => resp.json())
     .then(message => {
+      debugger
       createMessage(message, message.self, getDivFromChannelId(getActiveChatId()))
       let options = Array.from(inviteSelect.querySelectorAll("option"))
       let invited = options.find(option => option.value == message.sender)

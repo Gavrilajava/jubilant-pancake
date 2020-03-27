@@ -38,6 +38,7 @@ class User < ApplicationRecord
           {
             title: channel.title,
             owner: channel.owner.name,
+            owner_id: channel.owner.id,
             image: channel.owner.picture,
             id: channel.id,
             nonMembers: allUsers - channel.users.pluck(:name),
