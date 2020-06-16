@@ -33,11 +33,9 @@ See also the list of [contributors](https://github.com/Gavrilajava/mealter/graph
 
 ## License
 
-This project is presented for information purposes, any copying and commercial use is illegal - see the [LICENSE.md](LICENSE.md) file for details
+If it doesn't hurt anybody, feel free to use it as you want
 
 ## Acknowledgments
 
-* Menu from Patak was used: https://codepen.io/Patak/pen/QpLpOV/
-* This card design also inspire me: https://codepen.io/boylett/pen/BdntA
 * Thanks to my mom and the film academy.
 
